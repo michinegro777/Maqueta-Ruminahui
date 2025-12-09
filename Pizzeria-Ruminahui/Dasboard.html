@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard BI – Pizzería De Rumiñahui</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Librería de gráficos -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg: #0d0503;
+      --bg-soft: #1b0c08;
+      --card: #1c0f0a;
+      --card-soft: #24110c;
+      --primary: #f2c14f;      /* dorado queso */
+      --accent: #ff8f4c;       /* naranja horno */
+      --danger: #ff4e4e;
+      --text: #f6f1e9;
+      --muted: #b09a8a;
+      --border-soft: rgba(255, 255, 255, 0.08);
+      --shadow-soft: 0 14px 30px rgba(0, 0, 0, 0.8);
+      --radius-lg: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #3c1810, #050203);
+      color: var(--text);
+      padding: 16px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .dashboard-shell {
+      width: 100%;
+      max-width: 1200px;
+      background: linear-gradient(145deg, #130805, #050203);
+      border-radius: 24px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 18px 18px 20px;
+    }
+
+    header.dashboard-header {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 2px solid rgba(242, 193, 79, 0.9);
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 18px;
+      color: var(--primary);
+    }
+
+    .brand-text h1 {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .brand-text p {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .chip {
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 11px;
+      border: 1px solid var(--border-soft);
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .filter-group {
+      display: flex;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 999px;
+      padding: 3px;
+      border: 1px solid var(--border-soft);
+    }
+
+    .filter-btn {
+      border: none;
+      padding: 6px 10px;
+      font-size: 11px;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, transform 0.1s;
+    }
+
+    .filter-btn.active {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #3a2500;
+      font-weight: 600;
+      transform: translateY(-1px);
+    }
+
+    /* KPIs */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .kpi-card {
+      background: radial-gradient(circle at top left, #3b1810, var(--bg-soft));
+      border-radius: var(--radius-lg);
+      padding: 10px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.7);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .kpi-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 3px;
+    }
+
+    .kpi-trend {
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .kpi-trend.positive {
+      color: #6be28f;
+    }
+
+    .kpi-trend.neutral {
+      color: var(--muted);
+    }
+
+    .kpi-trend.negative {
+      color: var(--danger);
+    }
+
+    .kpi-icon {
+      position: absolute;
+      right: 10px;
+      top: 8px;
+      font-size: 20px;
+      opacity: 0.16;
+    }
+
+    /* Layout de gráficos */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 2.1fr) minmax(0, 1.4fr);
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+
+    .charts-grid-bottom {
+      display: grid;
+      grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.5fr);
+      gap: 14px;
+    }
+
+    .chart-card {
+      background: var(--card);
+      border-radius: var(--radius-lg);
+      padding: 10px 12px 8px;
+      border: 1px solid var(--border-soft);
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.7);
+      min-height: 230px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .chart-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #ffe6c7;
+    }
+
+    .chart-subtitle {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .chart-badge {
+      font-size: 10px;
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: rgba(242, 193, 79, 0.12);
+      border: 1px solid rgba(242, 193, 79, 0.45);
+      color: var(--primary);
+    }
+
+    .chart-body {
+      flex: 1;
+      position: relative;
+    }
+
+    .chart-body canvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Footer */
+    .footer-note {
+      margin-top: 14px;
+      font-size: 10px;
+      color: var(--muted);
+      text-align: right;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .kpi-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .charts-grid,
+      .charts-grid-bottom {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .dashboard-shell {
+        padding: 14px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      header.dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .controls {
+        align-self: stretch;
+        justify-content: space-between;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-shell">
+    <header class="dashboard-header">
+      <div class="brand-wrap">
+        <div class="brand-logo">
+          <!-- Si tienes el logo en web, puedes usarlo aquí con <img> -->
+          R
+        </div>
+        <div class="brand-text">
+          <h1>Dashboard BI · Pizzería De Rumiñahui</h1>
+          <p>Análisis de ventas, pedidos y comportamiento de clientes</p>
+        </div>
+      </div>
+      <div class="controls">
+        <div class="chip">
+          <span>📍 Trujillo</span>
+          <span>·</span>
+          <span>Multisede</span>
+        </div>
+        <div class="filter-group">
+          <button class="filter-btn active" data-period="1m">
+            Último mes
+          </button>
+          <button class="filter-btn" data-period="3m">
+            Últimos 3 meses
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- KPIs -->
+    <section class="kpi-grid">
+      <article class="kpi-card">
+        <div class="kpi-icon">S/</div>
+        <div class="kpi-label">Ventas totales</div>
+        <div class="kpi-value" id="kpi-ventas">S/ 42,560</div>
+        <div class="kpi-trend positive" id="kpi-ventas-trend">
+          ▲ +12% vs mes anterior
+        </div>
+      </article>
+
+      <article class="kpi-card">
+        <div class="kpi-icon">🧾</div>
+        <div class="kpi-label">Pedidos atendidos</div>
+        <div class="kpi-value" id="kpi-pedidos">1,720</div>
+        <div class="kpi-trend positive" id="kpi-pedidos-trend">
+          ▲ +8% vs mes anterior
+        </div>
+      </article>
+
+      <article class="kpi-card">
+        <div class="kpi-icon">🍽</div>
+        <div class="kpi-label">Ticket promedio</div>
+        <div class="kpi-value" id="kpi-ticket">S/ 24.74</div>
+        <div class="kpi-trend neutral" id="kpi-ticket-trend">
+          ● estable
+        </div>
+      </article>
+
+      <article class="kpi-card">
+        <div class="kpi-icon">⏱</div>
+        <div class="kpi-label">Tiempo prom. preparación</div>
+        <div class="kpi-value" id="kpi-tiempo">14 min</div>
+        <div class="kpi-trend positive" id="kpi-tiempo-trend">
+          ▼ -3 min vs mes anterior
+        </div>
+      </article>
+    </section>
+
+    <!-- Gráficos fila 1 -->
+    <section class="charts-grid">
+      <article class="chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Ventas por sede</div>
+            <div class="chart-subtitle">
+              Distribución de ventas en S/ por local
+            </div>
+          </div>
+          <span class="chart-badge">Sedes</span>
+        </div>
+        <div class="chart-body">
+          <canvas id="chartSedes"></canvas>
+        </div>
+      </article>
+
+      <article class="chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Métodos de compra</div>
+            <div class="chart-subtitle">
+              Delivery, salón y recojo en mostrador
+            </div>
+          </div>
+          <span class="chart-badge">Canales</span>
+        </div>
+        <div class="chart-body">
+          <canvas id="chartMetodos"></canvas>
+        </div>
+      </article>
+    </section>
+
+    <!-- Gráficos fila 2 -->
+    <section class="charts-grid-bottom">
+      <article class="chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Pedidos por hora del día</div>
+            <div class="chart-subtitle">
+              Comportamiento de la demanda (picos de venta)
+            </div>
+          </div>
+          <span class="chart-badge">Horario</span>
+        </div>
+        <div class="chart-body">
+          <canvas id="chartHoras"></canvas>
+        </div>
+      </article>
+
+      <article class="chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Pizzas más vendidas</div>
+            <div class="chart-subtitle">
+              Ranking de productos estrella
+            </div>
+          </div>
+          <span class="chart-badge">Top 5</span>
+        </div>
+        <div class="chart-body">
+          <canvas id="chartPizzas"></canvas>
+        </div>
+      </article>
+    </section>
+
+    <div class="footer-note">
+      Datos simulados para demostración de dashboard BI · Proyecto TIC
+    </div>
+  </div>
+
+  <script>
+    // Datos simulados para 1 mes y 3 meses
+    const dataSets = {
+      "1m": {
+        kpis: {
+          ventas: "S/ 42,560",
+          ventasTrend: "▲ +12% vs mes anterior",
+          ventasTrendClass: "positive",
+          pedidos: "1,720",
+          pedidosTrend: "▲ +8% vs mes anterior",
+          pedidosTrendClass: "positive",
+          ticket: "S/ 24.74",
+          ticketTrend: "● estable",
+          ticketTrendClass: "neutral",
+          tiempo: "14 min",
+          tiempoTrend: "▼ -3 min vs mes anterior",
+          tiempoTrendClass: "positive",
+        },
+        sedes: {
+          labels: ["Centro", "Primavera", "California", "Larco"],
+          values: [14200, 10800, 9600, 7960],
+        },
+        metodos: {
+          labels: ["Delivery", "Salón", "Recojo"],
+          values: [55, 30, 15],
+        },
+        horas: {
+          labels: ["1 pm", "2 pm", "3 pm", "7 pm", "8 pm", "9 pm"],
+          values: [220, 310, 260, 480, 505, 420],
+        },
+        pizzas: {
+          labels: ["Rumi (Casa)", "Americana", "Hawaiana", "Pepperoni", "Vegetariana"],
+          values: [540, 370, 310, 290, 210],
+        },
+      },
+      "3m": {
+        kpis: {
+          ventas: "S/ 118,400",
+          ventasTrend: "▲ +19% vs trimestre previo",
+          ventasTrendClass: "positive",
+          pedidos: "4,980",
+          pedidosTrend: "▲ +15% vs trimestre previo",
+          pedidosTrendClass: "positive",
+          ticket: "S/ 23.77",
+          ticketTrend: "▲ ligera alza",
+          ticketTrendClass: "positive",
+          tiempo: "15 min",
+          tiempoTrend: "▼ -2 min vs trimestre previo",
+          tiempoTrendClass: "positive",
+        },
+        sedes: {
+          labels: ["Centro", "Primavera", "California", "Larco"],
+          values: [39800, 30400, 28000, 19800],
+        },
+        metodos: {
+          labels: ["Delivery", "Salón", "Recojo"],
+          values: [52, 33, 15],
+        },
+        horas: {
+          labels: ["1 pm", "2 pm", "3 pm", "7 pm", "8 pm", "9 pm"],
+          values: [580, 760, 640, 1410, 1490, 1320],
+        },
+        pizzas: {
+          labels: ["Rumi (Casa)", "Americana", "Hawaiana", "Pepperoni", "Vegetariana"],
+          values: [1450, 980, 900, 830, 720],
+        },
+      },
+    };
+
+    // Elementos KPI
+    const kpiVentas = document.getElementById("kpi-ventas");
+    const kpiVentasTrend = document.getElementById("kpi-ventas-trend");
+    const kpiPedidos = document.getElementById("kpi-pedidos");
+    const kpiPedidosTrend = document.getElementById("kpi-pedidos-trend");
+    const kpiTicket = document.getElementById("kpi-ticket");
+    const kpiTicketTrend = document.getElementById("kpi-ticket-trend");
+    const kpiTiempo = document.getElementById("kpi-tiempo");
+    const kpiTiempoTrend = document.getElementById("kpi-tiempo-trend");
+
+    // Función para actualizar KPIs
+    function updateKpis(periodKey) {
+      const k = dataSets[periodKey].kpis;
+
+      kpiVentas.textContent = k.ventas;
+      kpiVentasTrend.textContent = k.ventasTrend;
+      kpiVentasTrend.className = "kpi-trend " + k.ventasTrendClass;
+
+      kpiPedidos.textContent = k.pedidos;
+      kpiPedidosTrend.textContent = k.pedidosTrend;
+      kpiPedidosTrend.className = "kpi-trend " + k.pedidosTrendClass;
+
+      kpiTicket.textContent = k.ticket;
+      kpiTicketTrend.textContent = k.ticketTrend;
+      kpiTicketTrend.className = "kpi-trend " + k.ticketTrendClass;
+
+      kpiTiempo.textContent = k.tiempo;
+      kpiTiempoTrend.textContent = k.tiempoTrend;
+      kpiTiempoTrend.className = "kpi-trend " + k.tiempoTrendClass;
+    }
+
+    // Inicializar gráficos con Chart.js
+    const sedesCtx = document.getElementById("chartSedes").getContext("2d");
+    const metodosCtx = document.getElementById("chartMetodos").getContext("2d");
+    const horasCtx = document.getElementById("chartHoras").getContext("2d");
+    const pizzasCtx = document.getElementById("chartPizzas").getContext("2d");
+
+    const initialPeriod = "1m";
+    const initialData = dataSets[initialPeriod];
+
+    const chartSedes = new Chart(sedesCtx, {
+      type: "bar",
+      data: {
+        labels: initialData.sedes.labels,
+        datasets: [
+          {
+            label: "Ventas (S/)",
+            data: initialData.sedes.values,
+            backgroundColor: "rgba(242, 193, 79, 0.7)",
+            borderColor: "rgba(242, 193, 79, 1)",
+            borderWidth: 1.2,
+            borderRadius: 6,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            ticks: { color: "#f6f1e9", font: { size: 11 } },
+            grid: { display: false },
+          },
+          y: {
+            ticks: { color: "#b9aaa0", font: { size: 10 } },
+            grid: { color: "rgba(255, 255, 255, 0.06)" },
+          },
+        },
+        plugins: {
+          legend: {
+            labels: { color: "#f6f1e9", font: { size: 11 } },
+          },
+        },
+      },
+    });
+
+    const chartMetodos = new Chart(metodosCtx, {
+      type: "doughnut",
+      data: {
+        labels: initialData.metodos.labels,
+        datasets: [
+          {
+            data: initialData.metodos.values,
+            backgroundColor: [
+              "rgba(242, 193, 79, 0.9)",
+              "rgba(255, 143, 76, 0.9)",
+              "rgba(153, 102, 255, 0.85)",
+            ],
+            borderColor: "#0d0503",
+            borderWidth: 2,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: "60%",
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels: { color: "#f6f1e9", font: { size: 11 } },
+          },
+        },
+      },
+    });
+
+    const chartHoras = new Chart(horasCtx, {
+      type: "line",
+      data: {
+        labels: initialData.horas.labels,
+        datasets: [
+          {
+            label: "Pedidos",
+            data: initialData.horas.values,
+            borderColor: "rgba(242, 193, 79, 1)",
+            backgroundColor: "rgba(242, 193, 79, 0.25)",
+            borderWidth: 1.8,
+            pointRadius: 3,
+            pointBackgroundColor: "#f2c14f",
+            fill: true,
+            tension: 0.35,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            ticks: { color: "#f6f1e9", font: { size: 11 } },
+            grid: { display: false },
+          },
+          y: {
+            ticks: { color: "#b9aaa0", font: { size: 10 } },
+            grid: { color: "rgba(255, 255, 255, 0.06)" },
+          },
+        },
+        plugins: {
+          legend: { labels: { color: "#f6f1e9", font: { size: 11 } } },
+        },
+      },
+    });
+
+    const chartPizzas = new Chart(pizzasCtx, {
+      type: "bar",
+      data: {
+        labels: initialData.pizzas.labels,
+        datasets: [
+          {
+            label: "Pedidos",
+            data: initialData.pizzas.values,
+            backgroundColor: "rgba(255, 143, 76, 0.85)",
+            borderColor: "rgba(255, 143, 76, 1)",
+            borderWidth: 1.2,
+            borderRadius: 6,
+          },
+        ],
+      },
+      options: {
+        indexAxis: "y",
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            ticks: { color: "#b9aaa0", font: { size: 10 } },
+            grid: { color: "rgba(255, 255, 255, 0.06)" },
+          },
+          y: {
+            ticks: { color: "#f6f1e9", font: { size: 11 } },
+            grid: { display: false },
+          },
+        },
+        plugins: {
+          legend: { labels: { color: "#f6f1e9", font: { size: 11 } } },
+        },
+      },
+    });
+
+    // Función para actualizar todos los gráficos
+    function updateCharts(periodKey) {
+      const data = dataSets[periodKey];
+
+      // Sedes
+      chartSedes.data.labels = data.sedes.labels;
+      chartSedes.data.datasets[0].data = data.sedes.values;
+      chartSedes.update();
+
+      // Métodos
+      chartMetodos.data.labels = data.metodos.labels;
+      chartMetodos.data.datasets[0].data = data.metodos.values;
+      chartMetodos.update();
+
+      // Horas
+      chartHoras.data.labels = data.horas.labels;
+      chartHoras.data.datasets[0].data = data.horas.values;
+      chartHoras.update();
+
+      // Pizzas
+      chartPizzas.data.labels = data.pizzas.labels;
+      chartPizzas.data.datasets[0].data = data.pizzas.values;
+      chartPizzas.update();
+    }
+
+    // Filtros de periodo
+    const filterButtons = document.querySelectorAll(".filter-btn");
+    filterButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const period = btn.getAttribute("data-period");
+        // Activar estilo botón
+        filterButtons.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        // Actualizar datos
+        updateKpis(period);
+        updateCharts(period);
+      });
+    });
+
+    // Inicializar KPIs
+    updateKpis(initialPeriod);
+  </script>
+</body>
+</html>

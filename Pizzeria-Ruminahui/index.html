@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>App – Pizzería Rumiñahui</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      /* Paleta inspirada en tus imágenes */
+      --primary: #7b1b16;      /* rojo ladrillo */
+      --primary-dark: #4b100d; /* rojo oscuro */
+      --accent: #f2c14f;       /* dorado queso */
+      --bg: #1b0c08;           /* fondo oscuro tipo horno */
+      --text: #f6f1e9;
+      --muted: #b9aaa0;
+      --card: #20100b;
+      --radius-lg: 20px;
+      --shadow-soft: 0 12px 28px rgba(0, 0, 0, 0.6);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top, #3b1810, #120705);
+      color: var(--text);
+      padding: 20px;
+    }
+
+    /* CONTENEDOR TIPO “CELULAR” */
+    .app-shell {
+      width: 100%;
+      max-width: 420px;
+      background: linear-gradient(180deg, #2a120c, #140907);
+      border-radius: 30px;
+      box-shadow: var(--shadow-soft);
+      overflow: hidden;
+      border: 1px solid rgba(0, 0, 0, 0.6);
+      display: flex;
+      flex-direction: column;
+      height: 90vh;
+      max-height: 760px;
+    }
+
+    /* BARRA SUPERIOR */
+    .app-header {
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #0d0503;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 2px solid rgba(255, 255, 255, 0.9);
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #fff;
+    }
+
+    .brand-text h1 {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      color: #fef5e8;
+    }
+
+    .brand-text p {
+      font-size: 11px;
+      opacity: 0.9;
+      color: var(--muted);
+    }
+
+    .header-pill {
+      font-size: 11px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      color: #f7f0e7;
+    }
+
+    .header-pill span:first-child {
+      font-weight: 600;
+    }
+
+    /* CONTENIDO SCROLL */
+    .app-content {
+      padding: 10px 14px 10px 14px;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    /* BARRA DE NAVEGACIÓN INFERIOR */
+    .app-nav {
+      display: flex;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      background: #0b0402;
+    }
+
+    .nav-btn {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 9px 6px 11px 6px;
+      font-size: 11px;
+      color: #8d7c72;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, transform 0.15s;
+    }
+
+    .nav-btn span.icon {
+      font-size: 18px;
+    }
+
+    .nav-btn.active {
+      color: var(--accent);
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.06);
+      transform: translateY(-1px);
+    }
+
+    /* VISTAS (pantallas) */
+    .view {
+      display: none;
+      animation: fadeIn 0.25s ease-out;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #ffe6c7;
+    }
+
+    .section-subtitle {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    /* CARDS GENERALES */
+    .card {
+      background: #1b0c08;
+      border-radius: var(--radius-lg);
+      padding: 12px 14px;
+      margin-bottom: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    /* CARD HERO CON FOTO DEL HORNO */
+    .card-hero {
+      padding: 0;
+      overflow: hidden;
+      position: relative;
+      color: #fff;
+      background: #000;
+      min-height: 190px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+
+    .hero-image {
+      position: absolute;
+      inset: 0;
+      background-image: url("img/hero-horno.jpg");
+      background-size: cover;
+      background-position: center;
+      filter: brightness(0.65);
+    }
+
+    .hero-overlay {
+      position: relative;
+      padding: 14px;
+      z-index: 1;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      border-radius: 999px;
+      padding: 4px 8px;
+      background: rgba(0, 0, 0, 0.55);
+      color: #ffefcf;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .hero-title {
+      font-size: 19px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .hero-text {
+      font-size: 12px;
+      opacity: 0.95;
+      margin-bottom: 8px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #ffe39a);
+      color: #3a2500;
+      box-shadow: 0 7px 16px rgba(0, 0, 0, 0.7);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.75);
+      color: #fff;
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 11px;
+    }
+
+    /* CHIPS / LISTAS */
+    .feature-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .feature-chip {
+      padding: 6px 8px;
+      border-radius: 14px;
+      background: #2a140e;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #f3e0cf;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .feature-chip span.icon {
+      font-size: 14px;
+    }
+
+    /* GALERÍA DE FOTOS DEL IG */
+    .photo-strip {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .photo-strip img {
+      width: 100%;
+      border-radius: 12px;
+      object-fit: cover;
+      aspect-ratio: 4 / 3;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
+    }
+
+    /* MENÚ */
+    .menu-category {
+      margin-top: 8px;
+      margin-bottom: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #ffcf7a;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .menu-category span.icon {
+      font-size: 16px;
+    }
+
+    .menu-card {
+      padding-top: 6px;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+    }
+
+    .menu-item:last-child {
+      border-bottom: none;
+    }
+
+    .menu-info h4 {
+      font-size: 13px;
+      margin-bottom: 2px;
+      color: #ffe6c7;
+    }
+
+    .menu-info p {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+
+    .menu-price {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    /* SEDES */
+    .branches {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .branch-name {
+      font-weight: 600;
+      font-size: 12px;
+      color: #ffe6c7;
+    }
+
+    .branch-address {
+      font-size: 11px;
+      color: var(--muted);
+      margin: 2px 0 6px;
+    }
+
+    .branch-tag {
+      font-size: 10px;
+      border-radius: 999px;
+      background: rgba(242, 193, 79, 0.12);
+      color: var(--accent);
+      padding: 3px 7px;
+      display: inline-block;
+      border: 1px solid rgba(242, 193, 79, 0.4);
+    }
+
+    /* PEDIDO */
+    .order-summary {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .order-item {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+      padding-bottom: 3px;
+      margin-bottom: 3px;
+      color: #f8eee4;
+    }
+
+    .order-item span.qty {
+      color: var(--muted);
+    }
+
+    .order-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 6px;
+      padding-top: 6px;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      font-size: 13px;
+      font-weight: 700;
+      color: #ffe6c7;
+    }
+
+    .order-status {
+      margin-top: 10px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .status-steps {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 6px;
+      font-size: 10px;
+      position: relative;
+      padding-top: 6px;
+    }
+
+    .status-line {
+      position: absolute;
+      top: 6px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.16);
+      z-index: 0;
+    }
+
+    .status-line-fill {
+      height: 2px;
+      background: var(--accent);
+      width: 0%;
+    }
+
+    .status-step {
+      flex: 1;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+      color: var(--muted);
+    }
+
+    .status-step::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: -4px;
+      transform: translateX(-50%);
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      background: #140907;
+    }
+
+    .status-step.active {
+      color: #ffe6c7;
+    }
+
+    .status-step.active::before {
+      border-color: var(--accent);
+      background: var(--accent);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 16px 10px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .empty-state span {
+      font-size: 28px;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    /* SCROLLBAR SUAVE */
+    .app-content::-webkit-scrollbar {
+      width: 6px;
+    }
+    .app-content::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 999px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- ENCABEZADO -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-logo">
+          <img src="img/logo-rumi.png" alt="Logo Pizzería De Rumiñahui" />
+        </div>
+        <div class="brand-text">
+          <h1>Pizzería De Rumiñahui</h1>
+          <p>Pizzería · Trattoria · Trujillo</p>
+        </div>
+      </div>
+      <div class="header-pill">
+        <span>App Piloto</span>
+        <span>Pedidos digitales</span>
+      </div>
+    </header>
+
+    <!-- CONTENIDO -->
+    <main class="app-content">
+      <!-- INICIO -->
+      <section id="view-inicio" class="view active">
+        <!-- HERO -->
+        <div class="card card-hero">
+          <div class="hero-image"></div>
+          <div class="hero-overlay">
+            <span class="pill">Nuevo · Pedido al horno</span>
+            <h2 class="hero-title">Tu pizza al horno de barro</h2>
+            <p class="hero-text">
+              Haz tu pedido desde el celular, envíalo a tu sede favorita y
+              recógelo recién salido del horno de Rumiñahui.
+            </p>
+            <div class="hero-actions">
+              <button class="btn btn-primary" data-go="menu">
+                <span>🍕</span> Ver carta
+              </button>
+              <button class="btn btn-outline" data-go="pedido">
+                <span>🛒</span> Mi pedido
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TARJETA DE EXPLICACIÓN -->
+        <div class="card">
+          <h3 style="font-size: 14px; margin-bottom: 4px">
+            ¿Qué problema resuelve?
+          </h3>
+          <p class="section-subtitle" style="margin-bottom: 6px">
+            Centraliza los pedidos de todas las sedes, evita errores al teléfono
+            y mejora la experiencia del cliente.
+          </p>
+          <div class="feature-list">
+            <div class="feature-chip">
+              <span class="icon">⚡</span>
+              <span>Pedidos rápidos y claros</span>
+            </div>
+            <div class="feature-chip">
+              <span class="icon">📊</span>
+              <span>Datos para análisis de ventas</span>
+            </div>
+            <div class="feature-chip">
+              <span class="icon">🧑‍🍳</span>
+              <span>Conexión con cocina (KDS)</span>
+            </div>
+            <div class="feature-chip">
+              <span class="icon">🏪</span>
+              <span>Gestión multisede en Trujillo</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- GALERÍA INSTAGRAM -->
+        <div class="card">
+          <h3 style="font-size: 14px; margin-bottom: 4px">
+            Desde nuestro Instagram
+          </h3>
+          <p class="section-subtitle" style="margin-bottom: 4px">
+            Imágenes de las pizzas y promociones de Pizzería De Rumiñahui.
+          </p>
+          <div class="photo-strip">
+            <img src="img/pizza-mesa.jpg" alt="Pizza Rumiñahui" />
+            <img src="img/promo-rumi.jpg" alt="Promo Rumi de la casa" />
+          </div>
+        </div>
+      </section>
+
+      <!-- MENÚ -->
+      <section id="view-menu" class="view">
+        <h2 class="section-title">Menú digital</h2>
+        <p class="section-subtitle">
+          Maqueta de la carta. En la versión real se conectará a la base de
+          datos de la pizzería.
+        </p>
+
+        <!-- PIZZAS CLÁSICAS -->
+        <div class="menu-category">
+          <span class="icon">🍕</span> Pizzas clásicas
+        </div>
+        <div class="card menu-card">
+          <div class="menu-item">
+            <div class="menu-info">
+              <h4>Margarita artesanal</h4>
+              <p>Tomate, mozzarella y albahaca fresca</p>
+              <span class="menu-price">S/ 25.00</span>
+            </div>
+            <button
+              class="btn btn-sm btn-outline"
+              onclick="addToCart('Margarita artesanal', 25)"
+            >
+              + Agregar
+            </button>
+          </div>
+          <div class="menu-item">
+            <div class="menu-info">
+              <h4>Americana</h4>
+              <p>Jamón, mozzarella, orégano</p>
+              <span class="menu-price">S/ 27.00</span>
+            </div>
+            <button
+              class="btn btn-sm btn-outline"
+              onclick="addToCart('Americana', 27)"
+            >
+              + Agregar
+            </button>
+          </div>
+        </div>
+
+        <!-- PIZZAS ESPECIALES -->
+        <div class="menu-category">
+          <span class="icon">🔥</span> Pizzas especiales de la casa
+        </div>
+        <div class="card menu-card">
+          <div class="menu-item">
+            <div class="menu-info">
+              <h4>Rumi de la casa</h4>
+              <p>La más pedida, receta única de Rumiñahui</p>
+              <span class="menu-price">S/ 32.00</span>
+            </div>
+            <button
+              class="btn btn-sm btn-outline"
+              onclick="addToCart('Rumi de la casa', 32)"
+            >
+              + Agregar
+            </button>
+          </div>
+          <div class="menu-item">
+            <div class="menu-info">
+              <h4>Cuatro quesos</h4>
+              <p>Mezcla de quesos seleccionados</p>
+              <span class="menu-price">S/ 34.00</span>
+            </div>
+            <button
+              class="btn btn-sm btn-outline"
+              onclick="addToCart('Cuatro quesos', 34)"
+            >
+              + Agregar
+            </button>
+          </div>
+        </div>
+
+        <!-- PASTAS / PROMOS -->
+        <div class="menu-category">
+          <span class="icon">🍝</span> Pastas & promos
+        </div>
+        <div class="card menu-card">
+          <div class="menu-item">
+            <div class="menu-info">
+              <h4>Lasaña artesanal</h4>
+              <p>Capas de pasta, carne y salsa casera</p>
+              <span class="menu-price">S/ 28.00</span>
+            </div>
+            <button
+              class="btn btn-sm btn-outline"
+              onclick="addToCart('Lasaña artesanal', 28)"
+            >
+              + Agregar
+            </button>
+          </div>
+          <div class="menu-item">
+            <div class="menu-info">
+              <h4>Promo noche en familia</h4>
+              <p>2 pizzas + gaseosa 1.5 L</p>
+              <span class="menu-price">S/ 69.90</span>
+            </div>
+            <button
+              class="btn btn-sm btn-outline"
+              onclick="addToCart('Promo noche en familia', 69.9)"
+            >
+              + Agregar
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- SEDES -->
+      <section id="view-sedes" class="view">
+        <h2 class="section-title">Sedes Rumiñahui</h2>
+        <p class="section-subtitle">
+          Vista para que el cliente elija dónde recoger su pedido.
+        </p>
+
+        <div class="card">
+          <div class="branches">
+            <div>
+              <div class="branch-name">Sede Orbegoso · Principal</div>
+              <div class="branch-address">Jirón Orbegoso 266 – Centro</div>
+              <span class="branch-tag">Recojo y salón</span>
+            </div>
+            <div>
+              <div class="branch-name">Orbegoso 2</div>
+              <div class="branch-address">Jirón Orbegoso 229 – Centro</div>
+              <span class="branch-tag">Recojo</span>
+            </div>
+            <div>
+              <div class="branch-name">Pizarro</div>
+              <div class="branch-address">Jirón Francisco Pizarro 822</div>
+              <span class="branch-tag">Recojo y salón</span>
+            </div>
+            <div>
+              <div class="branch-name">Condorcanqui</div>
+              <div class="branch-address">
+                Av. José Gabriel Condorcanqui 1236
+              </div>
+              <span class="branch-tag">Zona norte</span>
+            </div>
+            <div>
+              <div class="branch-name">Túpac Amaru</div>
+              <div class="branch-address">Av. Túpac Amaru</div>
+              <span class="branch-tag">Zona sur</span>
+            </div>
+            <div>
+              <div class="branch-name">Diego de Almagro</div>
+              <div class="branch-address">Jirón Diego de Almagro 875</div>
+              <span class="branch-tag">Recojo</span>
+            </div>
+            <div>
+              <div class="branch-name">Los Almendros</div>
+              <div class="branch-address">
+                Calle Los Almendros Mz E 246
+              </div>
+              <span class="branch-tag">Residencial</span>
+            </div>
+          </div>
+
+          <div style="margin-top: 10px; font-size: 11px; color: var(--muted)">
+            En la implementación real, la app enviaría el pedido a la sede
+            seleccionada y mostraría el tiempo estimado de preparación.
+          </div>
+        </div>
+      </section>
+
+      <!-- MI PEDIDO -->
+      <section id="view-pedido" class="view">
+        <h2 class="section-title">Mi pedido</h2>
+        <p class="section-subtitle">
+          Carrito de la app. El cliente revisa el detalle antes de confirmar.
+        </p>
+
+        <div class="card" id="order-card">
+          <div id="order-content" class="order-summary">
+            <div class="empty-state" id="empty-state">
+              <span>🍕</span>
+              Aún no tienes productos en tu pedido.<br />
+              Añade algo desde el menú.
+            </div>
+          </div>
+
+          <div class="order-total" id="order-total" style="display: none">
+            <span>Total (S/)</span>
+            <span id="order-amount">0.00</span>
+          </div>
+
+          <button
+            class="btn btn-primary"
+            style="width: 100%; margin-top: 10px"
+            onclick="confirmOrder()"
+          >
+            Confirmar pedido
+          </button>
+
+          <div class="order-status" id="order-status" style="display: none">
+            <strong>Estado del pedido</strong>
+            <div class="status-steps">
+              <div class="status-line">
+                <div class="status-line-fill" id="status-line-fill"></div>
+              </div>
+              <div class="status-step active" id="step1">Recibido</div>
+              <div class="status-step" id="step2">En horno</div>
+              <div class="status-step" id="step3">Listo</div>
+              <div class="status-step" id="step4">Entregado</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- NAVEGACIÓN INFERIOR -->
+    <nav class="app-nav">
+      <button class="nav-btn active" data-view="inicio">
+        <span class="icon">🏠</span>
+        Inicio
+      </button>
+      <button class="nav-btn" data-view="menu">
+        <span class="icon">🍕</span>
+        Menú
+      </button>
+      <button class="nav-btn" data-view="sedes">
+        <span class="icon">📍</span>
+        Sedes
+      </button>
+      <button class="nav-btn" data-view="pedido">
+        <span class="icon">🛒</span>
+        Pedido
+      </button>
+    </nav>
+  </div>
+
+  <script>
+    // Navegación entre vistas
+    const navButtons = document.querySelectorAll(".nav-btn");
+    const views = {
+      inicio: document.getElementById("view-inicio"),
+      menu: document.getElementById("view-menu"),
+      sedes: document.getElementById("view-sedes"),
+      pedido: document.getElementById("view-pedido"),
+    };
+
+    function showView(name) {
+      Object.values(views).forEach((v) => v.classList.remove("active"));
+      views[name].classList.add("active");
+      navButtons.forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.view === name);
+      });
+    }
+
+    navButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        showView(btn.dataset.view);
+      });
+    });
+
+    // Botones internos que cambian de vista
+    document.querySelectorAll("[data-go]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const target = btn.getAttribute("data-go");
+        showView(target);
+      });
+    });
+
+    // Carrito simple
+    let cart = [];
+
+    function addToCart(name, price) {
+      const existing = cart.find((item) => item.name === name);
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        cart.push({ name, price, qty: 1 });
+      }
+      renderCart();
+      showView("pedido");
+    }
+
+    function renderCart() {
+      const orderContent = document.getElementById("order-content");
+      const emptyState = document.getElementById("empty-state");
+      const orderTotal = document.getElementById("order-total");
+      const orderAmount = document.getElementById("order-amount");
+
+      orderContent.innerHTML = "";
+      let total = 0;
+
+      if (cart.length === 0) {
+        emptyState.style.display = "block";
+        orderTotal.style.display = "none";
+        orderContent.appendChild(emptyState);
+        document.getElementById("order-status").style.display = "none";
+        document.getElementById("status-line-fill").style.width = "0%";
+        return;
+      } else {
+        emptyState.style.display = "none";
+      }
+
+      cart.forEach((item) => {
+        total += item.price * item.qty;
+        const div = document.createElement("div");
+        div.className = "order-item";
+        div.innerHTML = `
+          <span>${item.name} <span class="qty">x${item.qty}</span></span>
+          <span>S/ ${(item.price * item.qty).toFixed(2)}</span>
+        `;
+        orderContent.appendChild(div);
+      });
+
+      orderAmount.textContent = total.toFixed(2);
+      orderTotal.style.display = "flex";
+      document.getElementById("order-status").style.display = "none";
+      document.getElementById("status-line-fill").style.width = "0%";
+    }
+
+    function confirmOrder() {
+      if (cart.length === 0) {
+        alert("Aún no has agregado productos al pedido.");
+        return;
+      }
+
+      const status = document.getElementById("order-status");
+      const fill = document.getElementById("status-line-fill");
+      const steps = [
+        document.getElementById("step1"),
+        document.getElementById("step2"),
+        document.getElementById("step3"),
+        document.getElementById("step4"),
+      ];
+
+      status.style.display = "block";
+
+      steps.forEach((s) => s.classList.remove("active"));
+      fill.style.width = "0%";
+
+      let current = 0;
+      function advance() {
+        if (current < steps.length) {
+          steps[current].classList.add("active");
+          fill.style.width =
+            ((current / (steps.length - 1)) * 100).toFixed(0) + "%";
+          current++;
+          if (current < steps.length) {
+            setTimeout(advance, 900);
+          }
+        }
+      }
+      advance();
+
+      alert(
+        "Prototipo visual: en la versión final el pedido se enviaría al sistema interno de la pizzería."
+      );
+    }
+  </script>
+</body>
+</html>
