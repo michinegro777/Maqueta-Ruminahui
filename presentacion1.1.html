@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hornos de Rumiñahui - Transformación Digital</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+/* 1. SETUP & UTILS */
+* { box-sizing: border-box; }
+body {
+    margin: 0; padding: 20px 0;
+    background-color: #f1f5f9; /* Slate 100 */
+    font-family: 'Open Sans', sans-serif;
+    display: grid; place-items: center; gap: 20px;
+}
+
+.slide-container {
+    width: 1280px; height: 720px;
+    background-color: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    position: relative; overflow: hidden;
+    display: flex; flex-direction: column;
+    padding: 60px;
+}
+
+/* 2. BRANDING */
+:root {
+    --primary: #ea580c; /* Rumiñahui Orange */
+    --secondary: #1e293b; /* Slate 800 */
+    --accent: #3b82f6; /* Tech Blue */
+    --success: #10b981;
+    --light: #f8fafc;
+}
+
+h1, h2, h3, h4 { font-family: 'Montserrat', sans-serif; color: var(--secondary); margin: 0; }
+h1 { font-size: 58px; font-weight: 800; line-height: 1.1; }
+h2 { font-size: 42px; font-weight: 700; color: var(--primary); margin-bottom: 30px; border-left: 6px solid var(--secondary); padding-left: 20px; }
+h3 { font-size: 24px; font-weight: 700; margin-bottom: 10px; }
+p, li { font-size: 18px; line-height: 1.5; color: #475569; margin-bottom: 12px; }
+
+/* 3. COMPONENTS */
+.card {
+    background: white; border: 1px solid #e2e8f0; border-radius: 16px;
+    padding: 25px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+}
+.card.highlight { background: #fff7ed; border-color: #fed7aa; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: center; height: 100%; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px; }
+
+/* LOGO FIX */
+.logo-header { position: absolute; top: 40px; right: 50px; display: flex; align-items: center; gap: 10px; z-index: 10; }
+.logo-placeholder {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 20px; color: #ea580c;
+    border: 2px solid #ea580c; padding: 8px 20px; border-radius: 50px; background: #fff;
+    box-shadow: 0 4px 10px rgba(234, 88, 12, 0.1);
+}
+
+/* Interactive Links Fixed */
+.link-card {
+    display: flex; flex-direction: column; height: 100%;
+    border: 2px solid #e2e8f0; border-radius: 16px; overflow: hidden;
+    background: white; text-decoration: none; color: inherit; cursor: pointer;
+    transition: transform 0.2s;
+    position: relative; z-index: 50; /* Ensure clickable */
+}
+.link-card:hover { transform: translateY(-5px); border-color: var(--primary); }
+.link-thumb {
+    height: 140px; background: #cbd5e1; display: flex; align-items: center; justify-content: center;
+    font-size: 50px; color: white; background-size: cover; background-position: center;
+}
+.link-content { padding: 15px; text-align: center; }
+.link-btn {
+    background: var(--primary); color: white; padding: 8px 20px; border-radius: 50px; font-weight: 700; font-size: 14px;
+    display: inline-block; margin-top: 5px;
+}
+
+/* Backgrounds */
+.bg-pattern {
+    position: absolute; inset: 0; opacity: 0.05; z-index: 0; pointer-events: none;
+    background-image: radial-gradient(#475569 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+/* Download FAB */
+.download-fab {
+    position: fixed; bottom: 30px; right: 30px;
+    background: var(--primary); color: white;
+    padding: 15px 30px; border-radius: 50px;
+    cursor: pointer; font-weight: 700; font-family: 'Montserrat', sans-serif;
+    box-shadow: 0 4px 20px rgba(234, 88, 12, 0.4);
+    z-index: 9999;
+}
+@media print { .download-fab { display: none; } .slide-container { break-after: page; border: 1px solid #ddd; } }
+
+/* Budget Table */
+.budget-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 16px; }
+.budget-table th { text-align: left; color: var(--secondary); padding: 12px; border-bottom: 2px solid var(--primary); font-family: 'Montserrat'; }
+.budget-table td { padding: 10px; border-bottom: 1px solid #e2e8f0; color: #334155; }
+.budget-table tr:last-child td { font-weight: 800; font-size: 20px; color: var(--primary); border-bottom: none; }
+    </style>
+</head>
+<body>
+
+<div class="download-fab" onclick="window.print()"><i class="fa-solid fa-file-pdf"></i> Guardar PDF</div>
+
+<!-- Slide 1: Title -->
+<div class="slide-container" id="slide1">
+    <div class="bg-pattern"></div>
+    <div class="content-wrapper" style="align-items: center; text-align: center;">
+        <div style="margin-bottom: 30px;">
+            <div class="logo-placeholder" style="font-size: 32px; padding: 15px 40px; border-width: 4px;">
+                <i class="fa-solid fa-pizza-slice"></i> Hornos de Rumiñahui
+            </div>
+        </div>
+        
+        <p style="text-transform: uppercase; letter-spacing: 3px; font-weight: 700; color: #64748b;">Proyecto Final - Introducción a las TIC</p>
+        <h1 style="max-width: 900px; margin: 20px 0;">Transformación Digital Integral</h1>
+        <p style="font-size: 24px;">Una propuesta estratégica para escalar el negocio gastronómico.</p>
+        
+        <div style="margin-top: 60px; display: flex; gap: 60px; border-top: 1px solid #cbd5e1; padding-top: 30px;">
+            <div style="text-align: left;">
+                <p style="font-size: 14px; margin: 0; color: #94a3b8; font-weight: 700;">ALUMNO</p>
+                <p style="margin: 0; font-weight: 600;">Cristian Kevin Leon Sillocca</p>
+            </div>
+            <div style="text-align: left;">
+                <p style="font-size: 14px; margin: 0; color: #94a3b8; font-weight: 700;">DOCENTE</p>
+                <p style="margin: 0; font-weight: 600;">Marleny Lorenza Rivas de la Cruz</p>
+            </div>
+             <div style="text-align: left;">
+                <p style="font-size: 14px; margin: 0; color: #94a3b8; font-weight: 700;">FECHA</p>
+                <p style="margin: 0; font-weight: 600;">2025 | Trujillo</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 2: Company Profile -->
+<div class="slide-container" id="slide2">
+    <div class="logo-header">
+        <div class="logo-placeholder"><i class="fa-solid fa-pizza-slice"></i> HR</div>
+    </div>
+    <div class="grid-2">
+        <div>
+            <h2>Perfil de la Empresa</h2>
+            <p><strong>Hornos de Rumiñahui E.I.R.L</strong> es una marca emblemática en Trujillo con más de 15 años de experiencia. Su modelo de negocio se basa en la tradición artesanal y la cercanía al cliente.</p>
+            <div style="margin-top: 30px;">
+                <h4 style="margin-bottom: 15px; color: var(--primary);">7 Sedes en Trujillo</h4>
+                <ul style="font-size: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <li><i class="fa-solid fa-store" style="color:var(--primary)"></i> Jr. Orbegoso (x2)</li>
+                    <li><i class="fa-solid fa-store" style="color:var(--primary)"></i> Jr. Pizarro</li>
+                    <li><i class="fa-solid fa-store" style="color:var(--primary)"></i> Av. Condorcanqui</li>
+                    <li><i class="fa-solid fa-store" style="color:var(--primary)"></i> Av. Tupac Amaru</li>
+                    <li><i class="fa-solid fa-store" style="color:var(--primary)"></i> Jr. Diego de Almagro</li>
+                </ul>
+            </div>
+        </div>
+        <div style="position: relative; height: 100%; max-height: 450px; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.1);">
+            <img src="https://images.unsplash.com/photo-1579751626657-72bc17010498?auto=format&fit=crop&w=800&q=80" style="width: 100%; height: 100%; object-fit: cover;" alt="Pizza Artesanal">
+        </div>
+    </div>
+</div>
+
+<!-- Slide 3: Problemática -->
+<div class="slide-container" id="slide3">
+    <div class="logo-header">
+        <div class="logo-placeholder"><i class="fa-solid fa-pizza-slice"></i> HR</div>
+    </div>
+    <div class="content-wrapper">
+        <h2>Análisis Situacional</h2>
+        <p style="max-width: 900px; margin-bottom: 40px;">A pesar de tener una estructura administrativa sólida, la falta de un <strong>Área Digital</strong> genera cuellos de botella.</p>
+        <div class="grid-3">
+            <div class="card highlight">
+                <i class="fa-solid fa-network-wired" style="font-size: 40px; color: #ef4444; margin-bottom: 20px;"></i>
+                <h3>Procesos Aislados</h3>
+                <p>Información fragmentada entre sedes. Uso de Excel desconectado.</p>
+            </div>
+            <div class="card highlight">
+                <i class="fa-regular fa-clipboard" style="font-size: 40px; color: #ef4444; margin-bottom: 20px;"></i>
+                <h3>Gestión Manual</h3>
+                <p>Pedidos en papel y control de stock manual aumentan el error humano.</p>
+            </div>
+            <div class="card highlight">
+                <i class="fa-solid fa-chart-line" style="font-size: 40px; color: #ef4444; margin-bottom: 20px;"></i>
+                <h3>Sin Analítica</h3>
+                <p>Decisiones basadas en intuición por falta de datos en tiempo real.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 4: Solución -->
+<div class="slide-container" id="slide4">
+    <div class="content-wrapper">
+        <h2 style="text-align: center; border: none;">Solución Integral</h2>
+        <div class="grid-4">
+            <div class="card" style="text-align: center; border-top: 5px solid var(--primary);">
+                <i class="fa-solid fa-laptop-code" style="font-size: 40px; color: var(--primary); margin-bottom: 20px;"></i>
+                <h3>Plataforma Unificada</h3>
+                <p style="font-size: 14px;">Web + App + Chatbot.</p>
+            </div>
+            <div class="card" style="text-align: center; border-top: 5px solid var(--accent);">
+                <i class="fa-solid fa-database" style="font-size: 40px; color: var(--accent); margin-bottom: 20px;"></i>
+                <h3>Data & BI</h3>
+                <p style="font-size: 14px;">Inteligencia de Negocios.</p>
+            </div>
+            <div class="card" style="text-align: center; border-top: 5px solid var(--success);">
+                <i class="fa-solid fa-tv" style="font-size: 40px; color: var(--success); margin-bottom: 20px;"></i>
+                <h3>Sistema KDS</h3>
+                <p style="font-size: 14px;">Pantallas en cocina.</p>
+            </div>
+            <div class="card" style="text-align: center; border-top: 5px solid #8b5cf6;">
+                <i class="fa-solid fa-shield-halved" style="font-size: 40px; color: #8b5cf6; margin-bottom: 20px;"></i>
+                <h3>Seguridad IA</h3>
+                <p style="font-size: 14px;">Protección inteligente.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 5: Comparativa -->
+<div class="slide-container" id="slide5">
+    <div class="logo-header">
+        <div class="logo-placeholder"><i class="fa-solid fa-pizza-slice"></i> HR</div>
+    </div>
+    <h2>Ventajas Competitivas</h2>
+    <div class="content-wrapper">
+        <div class="grid-2" style="align-items: start;">
+            <div class="card">
+                <h3 style="color: #64748b; border-bottom: 2px solid #cbd5e1; padding-bottom: 10px;">Tradicional (Actual)</h3>
+                <ul class="feature-list" style="margin-top: 20px;">
+                    <li><i class="fa-solid fa-xmark" style="color: #ef4444;"></i> Pedidos por teléfono/WhatsApp.</li>
+                    <li><i class="fa-solid fa-xmark" style="color: #ef4444;"></i> Inventario manual propenso a error.</li>
+                    <li><i class="fa-solid fa-xmark" style="color: #ef4444;"></i> Seguridad reactiva.</li>
+                </ul>
+            </div>
+            <div class="card highlight" style="box-shadow: 0 10px 20px rgba(234, 88, 12, 0.1);">
+                <h3 style="color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 10px;">Digital (Propuesta)</h3>
+                <ul class="feature-list" style="margin-top: 20px;">
+                    <li><i class="fa-solid fa-check" style="color: var(--success);"></i> <strong>Omnicanal:</strong> App, Web y Bot integrados.</li>
+                    <li><i class="fa-solid fa-check" style="color: var(--success);"></i> <strong>Stock Real:</strong> Control automático.</li>
+                    <li><i class="fa-solid fa-check" style="color: var(--success);"></i> <strong>Preventivo:</strong> Alertas IA en vivo.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 6: Prototipo (Links Fixed) -->
+<div class="slide-container" id="slide6">
+    <div style="text-align: center; margin-bottom: 20px;">
+        <h2 style="border: none; margin-bottom: 5px;">Prototipo Funcional</h2>
+        <p>Accede a las maquetas interactivas.</p>
+    </div>
+    <div class="grid-3">
+        <!-- App Link -->
+        <a href="https://michinegro777.github.io/Maqueta-Ruminahui/" target="_blank" class="link-card">
+            <div class="link-thumb" style="background-image: url('https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=600&q=80');">
+                <i class="fa-solid fa-mobile-screen-button" style="text-shadow: 0 2px 4px rgba(0,0,0,0.5);"></i>
+            </div>
+            <div class="link-content">
+                <h4>App Móvil</h4>
+                <p style="font-size: 14px;">Pedidos y Chatbot.</p>
+                <span class="link-btn">Ver Demo</span>
+            </div>
+        </a>
+        <!-- Web Link -->
+        <a href="https://pizzeria-ruminahui.b12sites.com/index" target="_blank" class="link-card">
+            <div class="link-thumb" style="background-image: url('https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?auto=format&fit=crop&w=600&q=80');">
+                <i class="fa-solid fa-globe" style="text-shadow: 0 2px 4px rgba(0,0,0,0.5);"></i>
+            </div>
+            <div class="link-content">
+                <h4>Página Web</h4>
+                <p style="font-size: 14px;">Reservas online.</p>
+                <span class="link-btn">Ver Demo</span>
+            </div>
+        </a>
+        <!-- Dashboard Link -->
+        <a href="https://michinegro777.github.io/Maqueta-Ruminahui/dashboard.html" target="_blank" class="link-card">
+            <div class="link-thumb" style="background-image: url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=600&q=80');">
+                <i class="fa-solid fa-chart-bar" style="text-shadow: 0 2px 4px rgba(0,0,0,0.5);"></i>
+            </div>
+            <div class="link-content">
+                <h4>Dashboard BI</h4>
+                <p style="font-size: 14px;">Reportes gerenciales.</p>
+                <span class="link-btn">Ver Demo</span>
+            </div>
+        </a>
+    </div>
+</div>
+
+<!-- Slide 7: Operaciones (Updated Image) -->
+<div class="slide-container" id="slide7">
+    <div class="grid-2">
+        <div>
+            <h2>Operaciones y Seguridad</h2>
+            <div style="margin-bottom: 20px;">
+                <h3 style="color: var(--accent);"><i class="fa-solid fa-fire-burner"></i> KDS (Kitchen Display)</h3>
+                <p>Automatiza el flujo de cocina. Los pedidos digitales aparecen instantáneamente en pantalla, eliminando el papel y reduciendo tiempos de espera.</p>
+            </div>
+            <div>
+                <h3 style="color: #8b5cf6;"><i class="fa-solid fa-eye"></i> Seguridad IA</h3>
+                <p>Sistema de cámaras inteligentes que detectan intrusos y protegen el inventario con alertas móviles.</p>
+            </div>
+        </div>
+        <div>
+            <!-- Replaced with the uploaded screenshot -->
+             <img src="uploaded:image_2600c0.jpg-57f12f0e-77d0-4e08-9642-1e961952003c" style="width: 100%; height: auto; object-fit: contain; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);" alt="Prototipo Operaciones">
+        </div>
+    </div>
+</div>
+
+<!-- Slide 8: Impacto -->
+<div class="slide-container" id="slide8">
+    <div class="content-wrapper">
+        <h2 style="text-align: center;">Impacto Proyectado</h2>
+        <div class="grid-4" style="margin-top: 30px;">
+            <div class="stat-box">
+                <span class="stat-val">+25%</span>
+                <span class="stat-lbl">Ventas</span>
+                <p style="font-size: 13px;">Canales digitales.</p>
+            </div>
+            <div class="stat-box">
+                <span class="stat-val">-30%</span>
+                <span class="stat-lbl">Tiempos</span>
+                <p style="font-size: 13px;">Eficiencia KDS.</p>
+            </div>
+            <div class="stat-box">
+                <span class="stat-val">-40%</span>
+                <span class="stat-lbl">Errores</span>
+                <p style="font-size: 13px;">Automatización.</p>
+            </div>
+            <div class="stat-box">
+                <span class="stat-val">-18%</span>
+                <span class="stat-lbl">Mermas</span>
+                <p style="font-size: 13px;">Control de stock.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 9: Gantt Chart (Replaced with uploaded image) -->
+<div class="slide-container" id="slide9">
+    <div class="logo-header">
+        <div class="logo-placeholder"><i class="fa-solid fa-pizza-slice"></i> HR</div>
+    </div>
+    <h2>Cronograma de Implementación</h2>
+    <p>Planificación de 14 semanas para la Sede Piloto.</p>
+    
+    <div style="width: 100%; height: 450px; display: flex; align-items: center; justify-content: center; background: #fff; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden;">
+        <img src="img/gantt.png"
+     style="width: 100%; height: 100%; object-fit: contain;"
+     alt="Diagrama de Gantt">
+
+    </div>
+</div>
+
+<!-- Slide 10: Presupuesto -->
+<div class="slide-container" id="slide10">
+    <div class="grid-2">
+        <div>
+            <h2>Presupuesto Piloto</h2>
+            <div class="card highlight" style="text-align: center; padding: 40px;">
+                <h3 style="color: var(--primary); font-size: 48px; margin: 0;">S/ 45,000</h3>
+                <p style="margin: 0; font-weight: 600;">Inversión Total</p>
+            </div>
+        </div>
+        <div class="card">
+            <table class="budget-table">
+                <thead><tr><th>Concepto</th><th style="text-align: right;">Total</th></tr></thead>
+                <tbody>
+                    <tr><td>Infraestructura Física</td><td style="text-align: right;">S/ 11,000</td></tr>
+                    <tr><td>Hardware Tecnológico</td><td style="text-align: right;">S/ 7,100</td></tr>
+                    <tr><td>Desarrollo de Software</td><td style="text-align: right;">S/ 10,000</td></tr>
+                    <tr><td>Servicios Cloud & BI</td><td style="text-align: right;">S/ 2,700</td></tr>
+                    <tr><td>KDS & Seguridad IA</td><td style="text-align: right;">S/ 5,500</td></tr>
+                    <tr><td>Auxiliares</td><td style="text-align: right;">S/ 1,700</td></tr>
+                    <tr><td>Servicios Profesionales</td><td style="text-align: right;">S/ 7,000</td></tr>
+                    <tr><td><strong>TOTAL</strong></td><td style="text-align: right;"><strong>S/ 45,000</strong></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 11: Equipo -->
+<div class="slide-container" id="slide11">
+    <div class="content-wrapper">
+        <h2 style="text-align: center;">Equipo de Ejecución</h2>
+        <div class="grid-3" style="margin-top: 30px;">
+            <div class="card" style="text-align: center; border-bottom: 4px solid var(--primary);">
+                <i class="fa-solid fa-user-gear" style="font-size: 40px; color: var(--primary); margin-bottom: 15px;"></i>
+                <h4>Cristian Leon Sillocca</h4>
+                <p style="font-weight: 700; font-size: 14px; color: var(--primary);">Líder de Proyecto</p>
+            </div>
+            <div class="card" style="text-align: center; border-bottom: 4px solid var(--accent);">
+                <i class="fa-solid fa-code" style="font-size: 40px; color: var(--accent); margin-bottom: 15px;"></i>
+                <h4>Desarrollo Externo</h4>
+                <p style="font-weight: 700; font-size: 14px; color: var(--accent);">Web & App</p>
+            </div>
+            <div class="card" style="text-align: center; border-bottom: 4px solid var(--success);">
+                <i class="fa-solid fa-screwdriver-wrench" style="font-size: 40px; color: var(--success); margin-bottom: 15px;"></i>
+                <h4>Soporte Técnico</h4>
+                <p style="font-weight: 700; font-size: 14px; color: var(--success);">Instalaciones</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 12: Conclusion -->
+<div class="slide-container" id="slide12" style="background: var(--secondary);">
+    <div class="content-wrapper" style="align-items: center; justify-content: center; text-align: center;">
+        <i class="fa-solid fa-pizza-slice" style="font-size: 60px; color: white; margin-bottom: 20px;"></i>
+        <h2 style="color: white; border: none;">Visión de Futuro</h2>
+        <p style="color: #cbd5e1; max-width: 800px; font-size: 22px;">
+            Hoy digitalizamos una sede. Mañana escalamos la excelencia operativa a toda la cadena.<br>
+            <strong>Hornos de Rumiñahui</strong> liderará la gastronomía digital en Trujillo.
+        </p>
+        <div style="margin-top: 40px; padding: 15px 40px; border: 2px solid var(--primary); border-radius: 50px; background: rgba(234, 88, 12, 0.1);">
+            <p style="color: white; margin: 0; font-weight: 700; font-size: 24px;">¡Gracias!</p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
