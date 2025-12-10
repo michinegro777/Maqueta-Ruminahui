@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hornos de Rumiñahui - Transformación Digital</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+/* 1. SETUP & UTILS */
+* { box-sizing: border-box; }
+body {
+    margin: 0; padding: 20px 0;
+    background-color: #f1f5f9; /* Slate 100 */
+    font-family: 'Open Sans', sans-serif;
+    display: grid; place-items: center; gap: 20px;
+}
+
+.slide-container {
+    width: 1280px; height: 720px;
+    background-color: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    position: relative; overflow: hidden;
+    display: flex; flex-direction: column;
+    padding: 60px;
+}
+
+/* 2. BRANDING */
+:root {
+    --primary: #ea580c; /* Rumiñahui Orange */
+    --secondary: #1e293b; /* Slate 800 */
+    --accent: #3b82f6; /* Tech Blue */
+    --success: #10b981;
+    --light: #f8fafc;
+}
+
+h1, h2, h3, h4 { font-family: 'Montserrat', sans-serif; color: var(--secondary); margin: 0; }
+h1 { font-size: 58px; font-weight: 800; line-height: 1.1; }
+h2 { font-size: 42px; font-weight: 700; color: var(--primary); margin-bottom: 30px; border-left: 6px solid var(--secondary); padding-left: 20px; }
+h3 { font-size: 24px; font-weight: 700; margin-bottom: 10px; }
+p, li { font-size: 18px; line-height: 1.5; color: #475569; margin-bottom: 12px; }
+
+/* 3. LAYOUTS */
+.content-wrapper { display: flex; flex-direction: column; height: 100%; justify-content: center; position: relative; z-index: 2; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: center; height: 100%; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px; }
+
+/* 4. COMPONENTS */
+.card {
+    background: white; border: 1px solid #e2e8f0; border-radius: 16px;
+    padding: 25px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+}
+.card.highlight { background: #fff7ed; border-color: #fed7aa; }
+
+/* Logo Styles with Fallback */
+.logo-container {
+    display: flex; align-items: center; gap: 10px;
+}
+.logo-img {
+    height: 120px;
+    object-fit: contain;
+}
+/* Estilo para cuando la imagen falla */
+.logo-fallback {
+    display: none;
+    font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 24px; color: #7c2d12;
+    border: 2px solid #7c2d12; padding: 10px 20px; border-radius: 8px;
+    background: #ffedd5;
+}
+/* Clase para cabecera */
+.logo-header { position: absolute; top: 40px; right: 50px; width: 100px; opacity: 0.9; }
+
+.stat-box { text-align: center; padding: 20px; background: var(--light); border-radius: 12px; border: 1px solid #e2e8f0; }
+.stat-val { font-size: 42px; font-weight: 800; color: var(--primary); display: block; }
+.stat-lbl { font-size: 13px; text-transform: uppercase; font-weight: 700; color: #64748b; }
+
+.feature-list li { display: flex; gap: 12px; align-items: flex-start; }
+.feature-list i { color: var(--success); margin-top: 6px; }
+
+/* Budget Table */
+.budget-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 16px; }
+.budget-table th { text-align: left; color: var(--secondary); padding: 12px; border-bottom: 2px solid var(--primary); font-family: 'Montserrat'; }
+.budget-table td { padding: 10px; border-bottom: 1px solid #e2e8f0; color: #334155; }
+.budget-table tr:last-child td { font-weight: 800; font-size: 20px; color: var(--primary); border-bottom: none; }
+
+/* Timeline */
+.timeline-row { display: flex; justify-content: space-between; position: relative; margin-top: 40px; }
+.timeline-row::before { content: ''; position: absolute; top: 20px; left: 0; right: 0; height: 4px; background: #e2e8f0; z-index: 0; }
+.t-item { position: relative; z-index: 1; width: 23%; background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 15px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+.t-badge { display: inline-block; background: var(--primary); color: white; padding: 4px 10px; border-radius: 20px; font-weight: 700; font-size: 12px; margin-bottom: 8px; }
+
+/* NEW INTERACTIVE LINK STYLES (Robust) */
+.link-card {
+    display: flex; flex-direction: column; height: 100%;
+    border: 2px solid #e2e8f0; border-radius: 16px; overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    background: white; text-decoration: none; color: inherit;
+    position: relative; z-index: 10; /* Ensure clickable */
+    cursor: pointer;
+}
+.link-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(234, 88, 12, 0.2);
+    border-color: var(--primary);
+}
+.link-image {
+    height: 160px; background-size: cover; background-position: center;
+    background-color: #cbd5e1; /* Fallback color */
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+}
+/* Overlay is always visible slightly to improve text contrast if image loads, or hide image issues */
+.link-image::after {
+    content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.3);
+}
+.link-icon-overlay {
+    position: relative; z-index: 2; color: white; font-size: 40px; 
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+.link-content { padding: 20px; text-align: center; }
+.link-btn {
+    display: inline-block; margin-top: 10px;
+    background: var(--primary); color: white; 
+    padding: 8px 20px; border-radius: 50px; font-weight: 700; font-size: 14px;
+}
+
+/* Backgrounds */
+.bg-pattern {
+    position: absolute; inset: 0; opacity: 0.05; z-index: 0; pointer-events: none;
+    background-image: radial-gradient(#475569 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+/* Floating Action Button for PDF */
+.download-fab {
+    position: fixed; bottom: 30px; right: 30px;
+    background: var(--primary); color: white;
+    padding: 15px 30px; border-radius: 50px;
+    cursor: pointer; font-weight: 700; font-family: 'Montserrat', sans-serif;
+    box-shadow: 0 4px 20px rgba(234, 88, 12, 0.4);
+    z-index: 9999; transition: transform 0.2s, box-shadow 0.2s;
+    display: flex; align-items: center; gap: 10px;
+}
+.download-fab:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(234, 88, 12, 0.6); }
+
+/* Print Styles */
+@media print {
+    body { background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .slide-container { break-after: page; box-shadow: none; border: 1px solid #ddd; margin: 0 auto; page-break-after: always; }
+    .download-fab { display: none !important; }
+    .link-card { border: 1px solid #ddd; }
+}
+    </style>
+</head>
+<body>
+
+<!-- Botón Flotante para Descargar/Imprimir -->
+<div class="download-fab" onclick="window.print()">
+    <i class="fa-solid fa-file-pdf"></i> Guardar como PDF
+</div>
+
+<!-- Slide 1: Title -->
+<div class="slide-container" id="slide1">
+    <div class="bg-pattern"></div>
+    <div class="content-wrapper" style="align-items: center; text-align: center;">
+        <!-- Logo con fallback -->
+        <div style="margin-bottom: 40px;">
+            <img src="uploaded:logotipo.jpg-f4f48093-20b5-4dac-b155-92c8548d9b30" class="logo-img" alt="Logo Rumiñahui" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <div class="logo-fallback">
+                <i class="fa-solid fa-pizza-slice" style="margin-right: 10px;"></i>Hornos de Rumiñahui
+            </div>
+        </div>
+        
+        <p style="text-transform: uppercase; letter-spacing: 3px; font-weight: 700; color: var(--primary);">Proyecto Final - Introducción a las TIC</p>
+        <h1 style="max-width: 900px; margin: 20px 0;">Transformación Digital Integral</h1>
+        <p style="font-size: 24px;">Una propuesta estratégica para escalar el negocio gastronómico.</p>
+        
+        <div style="margin-top: 60px; display: flex; gap: 60px; border-top: 1px solid #cbd5e1; padding-top: 30px;">
+            <div style="text-align: left;">
+                <p style="font-size: 14px; margin: 0; color: #94a3b8; font-weight: 700;">ALUMNO</p>
+                <p style="margin: 0; font-weight: 600;">Cristian Kevin Leon Sillocca</p>
+            </div>
+            <div style="text-align: left;">
+                <p style="font-size: 14px; margin: 0; color: #94a3b8; font-weight: 700;">DOCENTE</p>
+                <p style="margin: 0; font-weight: 600;">Marleny Lorenza Rivas de la Cruz</p>
+            </div>
+             <div style="text-align: left;">
+                <p style="font-size: 14px; margin: 0; color: #94a3b8; font-weight: 700;">AÑO / LUGAR</p>
+                <p style="margin: 0; font-weight: 600;">2025 | Trujillo – Perú</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 2: Company Profile -->
+<div class="slide-container" id="slide2">
+    <div class="bg-pattern"></div>
+    <!-- Mini Logo Header -->
+    <div class="logo-header">
+        <img src="uploaded:logotipo.jpg-f4f48093-20b5-4dac-b155-92c8548d9b30" style="width: 100%;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+        <div class="logo-fallback" style="font-size: 12px; padding: 5px;">Rumiñahui</div>
+    </div>
+
+    <div class="grid-2">
+        <div>
+            <h2>Perfil de la Empresa</h2>
+            <p><strong>Hornos de Rumiñahui E.I.R.L</strong> es una marca emblemática en Trujillo con más de 15 años de experiencia, destacando por su calidad artesanal y fidelidad de clientes.</p>
+            <div style="margin-top: 30px;">
+                <h4 style="margin-bottom: 15px; color: var(--primary);">Ubicaciones Estratégicas (7 Sedes)</h4>
+                <ul style="font-size: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <li><i class="fa-solid fa-location-dot" style="color:var(--primary)"></i> Jr. Orbegoso 266</li>
+                    <li><i class="fa-solid fa-location-dot" style="color:var(--primary)"></i> Jr. Orbegoso 229</li>
+                    <li><i class="fa-solid fa-location-dot" style="color:var(--primary)"></i> Jr. Pizarro 822</li>
+                    <li><i class="fa-solid fa-location-dot" style="color:var(--primary)"></i> Av. Condorcanqui</li>
+                    <li><i class="fa-solid fa-location-dot" style="color:var(--primary)"></i> Av. Tupac Amaru</li>
+                    <li><i class="fa-solid fa-location-dot" style="color:var(--primary)"></i> Jr. Diego de Almagro</li>
+                </ul>
+            </div>
+        </div>
+        <div style="position: relative; height: 400px; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.2);">
+            <img src="https://images.unsplash.com/photo-1579751626657-72bc17010498?auto=format&fit=crop&w=800&q=80" style="width: 100%; height: 100%; object-fit: cover;" alt="Pizza Artesanal">
+        </div>
+    </div>
+</div>
+
+<!-- Slide 3: Problemática -->
+<div class="slide-container" id="slide3">
+    <div class="logo-header">
+        <img src="uploaded:logotipo.jpg-f4f48093-20b5-4dac-b155-92c8548d9b30" style="width: 100%;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+        <div class="logo-fallback" style="font-size: 12px; padding: 5px;">Rumiñahui</div>
+    </div>
+    <div class="content-wrapper">
+        <h2>Análisis Situacional</h2>
+        <p style="max-width: 900px; margin-bottom: 40px;">A pesar de tener una estructura administrativa sólida (Legal, Marketing, Contabilidad), la ausencia de un <strong>Área Digital</strong> genera brechas operativas críticas.</p>
+        <div class="grid-3">
+            <div class="card highlight">
+                <div style="font-size: 40px; color: #ef4444; margin-bottom: 20px;"><i class="fa-solid fa-network-wired"></i></div>
+                <h3>Procesos Aislados</h3>
+                <p>Uso de Excel y POS básicos sin integración entre las 7 sedes. Información fragmentada.</p>
+            </div>
+            <div class="card highlight">
+                <div style="font-size: 40px; color: #ef4444; margin-bottom: 20px;"><i class="fa-regular fa-clipboard"></i></div>
+                <h3>Gestión Manual</h3>
+                <p>Pedidos escritos y control de inventarios manual, aumentando errores y lentitud.</p>
+            </div>
+            <div class="card highlight">
+                <div style="font-size: 40px; color: #ef4444; margin-bottom: 20px;"><i class="fa-solid fa-chart-line"></i></div>
+                <h3>Ceguera de Datos</h3>
+                <p>Sin Business Intelligence, la toma de decisiones es reactiva y basada en intuición.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 4: Solución Propuesta -->
+<div class="slide-container" id="slide4">
+    <div class="bg-pattern"></div>
+    <div class="content-wrapper">
+        <h2 style="text-align: center; border: none; padding: 0;">Ecosistema Digital Integral</h2>
+        <p style="text-align: center; margin-bottom: 50px;">Cuatro pilares tecnológicos para modernizar el negocio.</p>
+        <div class="grid-4">
+            <div class="card" style="text-align: center; border-top: 5px solid var(--primary);">
+                <i class="fa-solid fa-laptop-code" style="font-size: 40px; color: var(--primary); margin-bottom: 20px;"></i>
+                <h3>Plataforma Unificada</h3>
+                <p style="font-size: 15px;">Web + App + Chatbot IA. Omnicanalidad 24/7.</p>
+            </div>
+            <div class="card" style="text-align: center; border-top: 5px solid var(--accent);">
+                <i class="fa-solid fa-database" style="font-size: 40px; color: var(--accent); margin-bottom: 20px;"></i>
+                <h3>Data & BI</h3>
+                <p style="font-size: 15px;">Base de datos Cloud para análisis en tiempo real.</p>
+            </div>
+            <div class="card" style="text-align: center; border-top: 5px solid var(--success);">
+                <i class="fa-solid fa-tv" style="font-size: 40px; color: var(--success); margin-bottom: 20px;"></i>
+                <h3>Sistema KDS</h3>
+                <p style="font-size: 15px;">Pantallas en cocina: adiós al papel, hola eficiencia.</p>
+            </div>
+            <div class="card" style="text-align: center; border-top: 5px solid #8b5cf6;">
+                <i class="fa-solid fa-shield-halved" style="font-size: 40px; color: #8b5cf6; margin-bottom: 20px;"></i>
+                <h3>Seguridad IA</h3>
+                <p style="font-size: 15px;">Reconocimiento inteligente y alertas proactivas.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 5: Comparativa -->
+<div class="slide-container" id="slide5">
+    <div class="logo-header">
+        <img src="uploaded:logotipo.jpg-f4f48093-20b5-4dac-b155-92c8548d9b30" style="width: 100%;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+        <div class="logo-fallback" style="font-size: 12px; padding: 5px;">Rumiñahui</div>
+    </div>
+    <h2>Ventajas Competitivas</h2>
+    <div class="content-wrapper">
+        <div class="grid-2" style="align-items: flex-start;">
+            <div class="card" style="background: #f8fafc;">
+                <h3 style="color: #64748b; border-bottom: 2px solid #cbd5e1; padding-bottom: 10px; margin-bottom: 20px;">Situación Actual (Tradicional)</h3>
+                <ul class="feature-list">
+                    <li><i class="fa-solid fa-xmark" style="color: #ef4444;"></i> Pedidos dispersos (WhatsApp, Teléfono).</li>
+                    <li><i class="fa-solid fa-xmark" style="color: #ef4444;"></i> Inventarios desactualizados.</li>
+                    <li><i class="fa-solid fa-xmark" style="color: #ef4444;"></i> Seguridad reactiva (solo grabación).</li>
+                </ul>
+            </div>
+            <div class="card highlight" style="box-shadow: 0 10px 30px rgba(234, 88, 12, 0.15);">
+                <h3 style="color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-bottom: 20px;">Nueva Propuesta (Digital)</h3>
+                <ul class="feature-list">
+                    <li><i class="fa-solid fa-check" style="color: var(--success);"></i> <strong>Omnicanalidad:</strong> Todo integrado.</li>
+                    <li><i class="fa-solid fa-check" style="color: var(--success);"></i> <strong>Tiempo Real:</strong> Control total de stock.</li>
+                    <li><i class="fa-solid fa-check" style="color: var(--success);"></i> <strong>Prevención:</strong> Alertas IA proactivas.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 6: Prototipo Interactivo -->
+<div class="slide-container" id="slide6">
+    <div class="bg-pattern"></div>
+    <div style="text-align: center; margin-bottom: 30px;">
+        <h2 style="border: none; margin-bottom: 10px;">Prototipo Funcional</h2>
+        <p>Selecciona una opción para navegar a la maqueta interactiva.</p>
+    </div>
+    
+    <div class="grid-3">
+        <!-- APP -->
+        <a href="https://michinegro777.github.io/Maqueta-Ruminahui/" target="_blank" class="link-card">
+            <div class="link-image" style="background-image: url('https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=600&q=80');">
+                <i class="fa-solid fa-mobile-screen-button link-icon-overlay"></i>
+            </div>
+            <div class="link-content">
+                <h4>App Móvil + Chatbot</h4>
+                <p style="font-size: 14px; margin-bottom: 10px;">Pedidos rápidos y soporte IA.</p>
+                <span class="link-btn">Ver Prototipo</span>
+            </div>
+        </a>
+
+        <!-- WEB -->
+        <a href="https://pizzeria-ruminahui.b12sites.com/index" target="_blank" class="link-card">
+            <div class="link-image" style="background-image: url('https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?auto=format&fit=crop&w=600&q=80');">
+                <i class="fa-solid fa-globe link-icon-overlay"></i>
+            </div>
+            <div class="link-content">
+                <h4>Página Web</h4>
+                <p style="font-size: 14px; margin-bottom: 10px;">Reservas y carta digital.</p>
+                <span class="link-btn">Ver Prototipo</span>
+            </div>
+        </a>
+
+        <!-- DASHBOARD -->
+        <a href="https://michinegro777.github.io/Maqueta-Ruminahui/dashboard.html" target="_blank" class="link-card">
+            <div class="link-image" style="background-image: url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=600&q=80');">
+                <i class="fa-solid fa-chart-bar link-icon-overlay"></i>
+            </div>
+            <div class="link-content">
+                <h4>Dashboard BI</h4>
+                <p style="font-size: 14px; margin-bottom: 10px;">Control gerencial total.</p>
+                <span class="link-btn">Ver Prototipo</span>
+            </div>
+        </a>
+    </div>
+</div>
+
+<!-- Slide 7: Deep Dive Operaciones -->
+<div class="slide-container" id="slide7">
+    <div class="grid-2">
+        <div>
+            <h2>Operaciones y Seguridad</h2>
+            <div style="margin-bottom: 30px;">
+                <h3 style="color: var(--accent);"><i class="fa-solid fa-fire-burner"></i> Kitchen Display (KDS)</h3>
+                <p>Automatiza el flujo de cocina. Los pedidos digitales aparecen instantáneamente en pantalla, eliminando papel y errores.</p>
+            </div>
+            <div>
+                <h3 style="color: #8b5cf6;"><i class="fa-solid fa-eye"></i> Seguridad IA</h3>
+                <p>Cámaras con analítica que detectan intrusos, cuentan aforo y protegen el inventario enviando alertas al móvil.</p>
+            </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+            <div style="height: 200px; border-radius: 12px; overflow: hidden; background: #000;">
+                 <img src="https://images.unsplash.com/photo-1556910103-1c02745a30bf?auto=format&fit=crop&w=800&q=80" style="width: 100%; height: 100%; object-fit: cover;" alt="Cocina">
+            </div>
+             <div style="height: 200px; border-radius: 12px; overflow: hidden; background: #000;">
+                <img src="https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&w=800&q=80" style="width: 100%; height: 100%; object-fit: cover;" alt="Seguridad">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 8: Impacto -->
+<div class="slide-container" id="slide8">
+    <div class="bg-pattern"></div>
+    <div class="content-wrapper">
+        <h2 style="text-align: center;">Impacto Proyectado</h2>
+        <div class="grid-4" style="margin-top: 30px;">
+            <div class="stat-box">
+                <span class="stat-val">+25%</span>
+                <span class="stat-lbl">Ventas Digitales</span>
+                <p style="font-size: 13px; margin-top: 10px;">Vía App y Web integradas.</p>
+            </div>
+            <div class="stat-box">
+                <span class="stat-val">-30%</span>
+                <span class="stat-lbl">Tiempo Espera</span>
+                <p style="font-size: 13px; margin-top: 10px;">Optimización con KDS.</p>
+            </div>
+            <div class="stat-box">
+                <span class="stat-val">-40%</span>
+                <span class="stat-lbl">Errores Pedidos</span>
+                <p style="font-size: 13px; margin-top: 10px;">Cero procesos manuales.</p>
+            </div>
+            <div class="stat-box">
+                <span class="stat-val">-18%</span>
+                <span class="stat-lbl">Mermas Stock</span>
+                <p style="font-size: 13px; margin-top: 10px;">Control predictivo.</p>
+            </div>
+        </div>
+        <p style="text-align: center; margin-top: 40px; font-style: italic; font-size: 16px;">Fuente: Benchmarking (Domino's Pizza, Pardos Chicken).</p>
+    </div>
+</div>
+
+<!-- Slide 9: Roadmap -->
+<div class="slide-container" id="slide9">
+    <div class="logo-header">
+        <img src="uploaded:logotipo.jpg-f4f48093-20b5-4dac-b155-92c8548d9b30" style="width: 100%;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+        <div class="logo-fallback" style="font-size: 12px; padding: 5px;">Rumiñahui</div>
+    </div>
+    <h2>Cronograma (14 Semanas)</h2>
+    <div class="content-wrapper">
+        <div class="timeline-row">
+            <div class="t-item">
+                <span class="t-badge">Sem 1-2</span>
+                <h4>Infraestructura</h4>
+                <p style="font-size: 14px;">Oficina digital, redes y hardware.</p>
+            </div>
+            <div class="t-item">
+                <span class="t-badge">Sem 3-7</span>
+                <h4>Desarrollo</h4>
+                <p style="font-size: 14px;">Web/App, Chatbot IA y BD Cloud.</p>
+            </div>
+            <div class="t-item">
+                <span class="t-badge">Sem 8-10</span>
+                <h4>Instalación</h4>
+                <p style="font-size: 14px;">KDS en cocina y cámaras de seguridad.</p>
+            </div>
+            <div class="t-item">
+                <span class="t-badge">Sem 11-14</span>
+                <h4>Despliegue</h4>
+                <p style="font-size: 14px;">Capacitación, piloto y lanzamiento.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 10: Presupuesto -->
+<div class="slide-container" id="slide10">
+    <div class="grid-2">
+        <div>
+            <h2>Presupuesto Piloto</h2>
+            <p>Inversión para la transformación completa de la Sede Principal. (Sedes futuras -60% costo).</p>
+            <div class="card highlight" style="margin-top: 30px; text-align: center;">
+                <h3 style="color: var(--primary); font-size: 32px; margin-bottom: 10px;">S/ 45,000</h3>
+                <p style="margin: 0;">Inversión Total Exacta</p>
+            </div>
+        </div>
+        <div class="card">
+            <table class="budget-table">
+                <thead><tr><th>Concepto</th><th style="text-align: right;">Monto (S/)</th></tr></thead>
+                <tbody>
+                    <tr><td>Infraestructura Física</td><td style="text-align: right;">11,000</td></tr>
+                    <tr><td>Equipamiento Tecnológico</td><td style="text-align: right;">7,100</td></tr>
+                    <tr><td>Desarrollo Plataforma</td><td style="text-align: right;">10,000</td></tr>
+                    <tr><td>Servicios Cloud & Licencias</td><td style="text-align: right;">2,700</td></tr>
+                    <tr><td>Sistema KDS & Seguridad</td><td style="text-align: right;">5,500</td></tr>
+                    <tr><td>Equipos Auxiliares</td><td style="text-align: right;">1,700</td></tr>
+                    <tr><td>Mano de Obra Profesional</td><td style="text-align: right;">7,000</td></tr>
+                    <tr><td><strong>TOTAL GENERAL</strong></td><td style="text-align: right;"><strong>45,000</strong></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 11: Equipo -->
+<div class="slide-container" id="slide11">
+    <div class="bg-pattern"></div>
+    <div class="content-wrapper">
+        <h2 style="text-align: center;">Equipo de Ejecución</h2>
+        <div class="grid-3" style="margin-top: 40px;">
+            <div class="card" style="text-align: center; border-bottom: 4px solid var(--primary);">
+                <div style="width: 80px; height: 80px; background: #e2e8f0; border-radius: 50%; margin: 0 auto 20px; display: grid; place-items: center;"><i class="fa-solid fa-user-gear" style="font-size: 30px; color: var(--primary);"></i></div>
+                <h4>Cristian Leon Sillocca</h4>
+                <p style="color: var(--primary); font-weight: 700; font-size: 14px;">Ingeniero TIC - Líder</p>
+            </div>
+            <div class="card" style="text-align: center; border-bottom: 4px solid var(--accent);">
+                <div style="width: 80px; height: 80px; background: #e2e8f0; border-radius: 50%; margin: 0 auto 20px; display: grid; place-items: center;"><i class="fa-solid fa-code" style="font-size: 30px; color: var(--accent);"></i></div>
+                <h4>Equipo Desarrollo</h4>
+                <p style="color: var(--accent); font-weight: 700; font-size: 14px;">App, Web & API</p>
+            </div>
+            <div class="card" style="text-align: center; border-bottom: 4px solid var(--success);">
+                <div style="width: 80px; height: 80px; background: #e2e8f0; border-radius: 50%; margin: 0 auto 20px; display: grid; place-items: center;"><i class="fa-solid fa-screwdriver-wrench" style="font-size: 30px; color: var(--success);"></i></div>
+                <h4>Soporte Técnico</h4>
+                <p style="color: var(--success); font-weight: 700; font-size: 14px;">Instalación Redes</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 12: Vision & Conclusion -->
+<div class="slide-container" id="slide12" style="background: var(--secondary);">
+    <div class="bg-pattern"></div>
+    <div class="content-wrapper" style="align-items: center; justify-content: center; text-align: center;">
+        <i class="fa-solid fa-pizza-slice" style="font-size: 80px; color: white; margin-bottom: 30px;"></i>
+        <h2 style="color: white; border: none; font-size: 52px; margin-bottom: 20px;">Visión de Futuro</h2>
+        <p style="color: #cbd5e1; font-size: 22px; max-width: 900px; margin-bottom: 40px;">
+            Hoy digitalizamos la Sede Piloto. Mañana integramos IoT, Delivery Automatizado y Fidelización para las 7 sedes. <br>
+            <strong>Hornos de Rumiñahui</strong> está listo para liderar la era digital.
+        </p>
+        <div style="padding: 20px 40px; border: 2px solid var(--primary); border-radius: 50px; background: rgba(234, 88, 12, 0.1);">
+            <p style="color: white; margin: 0; font-size: 28px; font-weight: 700;">¡Muchas Gracias!</p>
+        </div>
+        <p style="margin-top: 30px; color: #94a3b8; font-size: 16px;">¿Preguntas?</p>
+    </div>
+</div>
+
+</body>
+</html>
